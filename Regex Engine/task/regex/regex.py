@@ -1,13 +1,12 @@
 # write your code here
 
-
-
 def input_string():
     the_input = input()
     index_no = the_input.index("|")
     reg = the_input[0:index_no]
     ts = the_input[index_no+1:]
     return reg, ts
+
 
 def quick_compare(reg, ts):
     if reg in ts:
@@ -21,8 +20,8 @@ def quick_compare(reg, ts):
 
 
 def evaluate(reg, ts):
-    eval = quick_compare(reg, ts)
-    if eval:
+    ev = quick_compare(reg, ts)
+    if ev:
         return True
     else:
         str_len = len(ts)
@@ -38,7 +37,6 @@ def evaluate(reg, ts):
                 if reg_minus_dot in ts:
                     return True
     return False
-
 
 
 # Main Body
