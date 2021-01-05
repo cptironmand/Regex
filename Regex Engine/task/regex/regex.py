@@ -1,4 +1,3 @@
-# write your code here
 
 def input_string():
     the_input = input()
