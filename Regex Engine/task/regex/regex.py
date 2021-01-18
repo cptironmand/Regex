@@ -1,3 +1,6 @@
+# reg stands for the regression variable
+# ts is the string variable
+# _ev means the variable has been evaluated
 
 def input_strings():
     the_input = input()
@@ -20,6 +23,32 @@ def quick_compare(reg, ts):
         return True
     else:
         return False
+
+
+# NEED TO REVISIT THIS - DON'T THINK I WANT TO DO IT THIS WAY
+def starting(reg, ts):
+    # function to determine if there is a karat leading the reg
+    # and if so, to return the reg without the karat and ts strings accordingly
+    # so that they are the same length
+    if reg[0] == "^":
+        reg_ev = reg[1:]
+        length = len(reg_ev)
+        ts_ev = ts[0:length]
+        return reg_ev, ts_ev
+    return reg, ts
+
+
+# NEED TO REVISIT THIS - DON'T THINK I WANT TO DO IT THIS WAY
+def ending(reg, ts):
+    #funciton to determine if there is a dollar sign ending the reg
+    # adn if so, to return the reg without the $ and ts strings accordingly
+    # so that they are the same length
+    if reg[-1] == '$':
+        reg_ev = reg[0:-1]
+        if len(ts) >= len(reg_ev):
+            ts_ev = ts[-len(reg_ev):] # Grab the last x characters in ts as ts_ev
+            return reg_ev, ts_ev
+    return reg, ts
 
 
 def evaluate(reg, ts):
