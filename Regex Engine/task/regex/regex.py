@@ -25,45 +25,37 @@ def quick_compare(reg, ts):
         return False
 
 
-# NEED TO REVISIT THIS - DON'T THINK I WANT TO DO IT THIS WAY
 def starting(reg, ts):
-    # function to determine if there is a karat leading the reg
-    # and if so, to return the reg without the karat and ts strings accordingly
-    # so that they are the same length
-    if reg[0] == "^":
-        reg_ev = reg[1:]
-        length = len(reg_ev)
-        ts_ev = ts[0:length]
-        return reg_ev, ts_ev
-    return reg, ts
+    reg_ev = reg[1:]
+    length = len(reg_ev)
+    ts_ev = ts[0:length]
+    return reg_ev, ts_ev
 
 
-# NEED TO REVISIT THIS - DON'T THINK I WANT TO DO IT THIS WAY
 def ending(reg, ts):
-    #funciton to determine if there is a dollar sign ending the reg
-    # adn if so, to return the reg without the $ and ts strings accordingly
-    # so that they are the same length
-    if reg[-1] == '$':
-        reg_ev = reg[0:-1]
-        if len(ts) >= len(reg_ev):
-            ts_ev = ts[-len(reg_ev):] # Grab the last x characters in ts as ts_ev
-            return reg_ev, ts_ev
-    return reg, ts
+    reg_ev = reg[0:-1]
+    ts_ev = ts[-len(reg_ev):]  # Grab the last x characters in ts as ts_ev
+    return reg_ev, ts_ev
 
 
 def evaluate(reg, ts):
     ev = quick_compare(reg, ts)
-    #print(f"ev = {ev}")
     if ev:
         return True
+
+    # Check starting and ending
+    if reg[0] == "^":
+        reg, ts = starting(reg, ts)
+    if reg[-1] == '$':
+        reg, ts = ending(reg, ts)
+
+    # Run the regression
     if reg and ts:
         if (reg[0] == ".") or (reg[0] == ts[0]):
             reg_ev = reg[1:]
-            #print(reg_ev)
-            ts_ev = ts[1:]
-            #print(ts_ev)
-            return evaluate(reg_ev, ts_ev)
-        elif (reg[0] != ts[0]):
+            mod_string = ts[1:]
+            return evaluate(reg_ev, mod_string)
+        elif reg[0] != ts[0]:
             return False
     else:
         return False
