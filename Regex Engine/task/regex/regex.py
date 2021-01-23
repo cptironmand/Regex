@@ -1,5 +1,5 @@
-# reg stands for the regression variable
-# ts is the string variable
+# reg stands for the regex variable in a function
+# ts is the string variable in a function
 # _ev means the variable has been evaluated
 
 def input_strings():
@@ -38,6 +38,50 @@ def ending(reg, ts):
     return reg_ev, ts_ev
 
 
+def check_questionmark(reg, ts):  # Preceding char occurs 0 or 1 times
+    if "?" in reg:
+        ind = reg.index("?")
+        # Preceding char occurs 1 times
+        if (len(reg) - (len(ts))) == 1:
+            reg_ev = reg[0:ind] + reg[ind+1:]
+            return reg_ev
+        # Preceding char occurs 0 times
+        elif (len(reg) - (len(ts)) == 2):
+            reg_ev = reg[0:ind-1] + reg[ind+1:]
+            return reg_ev
+        else:
+            return reg
+    else:
+        return reg
+
+
+def check_star(reg, ts):  # Preceding char occurs 0 or more times
+    if "*" in reg:
+        ind = reg.index("*")
+        # Preceding char occurs 0 times
+        if (len(reg) - (len(ts)) == 2):
+            reg_ev = reg[0:ind - 1] + reg[ind + 1:]
+        # Preceding character occurs 1 or more times
+        else:
+            regtest = reg[0:ind] + reg[ind+1:]
+            need = len(regtest) - len(ts)
+            reg_ev = reg[0:ind-1] + (reg[ind]*need) + reg[ind+1:]
+        return reg_ev
+    else:
+        return reg
+
+
+def check_plus(reg, ts):  # Preceding char occurs 1 or more times
+    if "+" in reg:
+        ind = reg.index("+")
+        regtest = reg[0:ind] + reg[ind+1:]
+        need = len(regtest) - len(ts)
+        reg_ev = reg[0:ind-1] + (reg[ind]*need) + reg[ind+1:]
+        return reg_ev
+    else:
+        return reg
+
+
 def evaluate(reg, ts):
     ev = quick_compare(reg, ts)
     if ev:
@@ -63,4 +107,11 @@ def evaluate(reg, ts):
 
 # Main Body
 regex, the_string = input_strings()
+print(f'the regex is {regex}')
+regex = check_questionmark(regex, the_string)
+print(f'the regex is {regex}')
+regex = check_star(regex, the_string)
+print(f'the regex is {regex}')
+regex = check_plus(regex, the_string)
+print(f'the regex is {regex}')
 print(evaluate(regex, the_string))
