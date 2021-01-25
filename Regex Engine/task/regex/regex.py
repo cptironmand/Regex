@@ -1,6 +1,7 @@
 # reg stands for the regex variable in a function
 # ts is the string variable in a function
 # _ev means the variable has been evaluated
+
 import sys
 sys.setrecursionlimit(10000)
 
@@ -82,21 +83,64 @@ def check_star(reg, ts):  # Preceding char occurs 0 or more times
 def check_plus(reg, ts):  # Preceding char occurs 1 or more times
     if "+" in reg:
         ind = reg.index("+")
-        var_letter = reg[ind-1]
+        char = reg[ind-1]
         count = 0
-        loop = len(ts)
-        # Preceding char occurs 1 times
-        if (len(reg) - (len(ts))) == 1:  # Check for only the '$'
-            reg_ev = reg[0:ind] + reg[ind + 1:]
-            return reg_ev
-        else:
-            for i in range(loop):
-                if ts[i] == ts[i - 1]:
-                    count +=1
-            reg_ev = reg[0:ind-1] + (var_letter*(count)) + reg[ind+1:]
-            return reg_ev
+        beg = reg[0:ind]
+        end = reg[ind+1:]
+
+        # loop to find max number of reg chars
+        for l in ts:
+            if l == char:
+                count +=1
+
+        # Build a work in progress regex and test it while you build it for the length of 'count'
+        for i in range(count):
+            ev = evaluate((beg + char*i + end), ts)
+            if ev:
+                return (beg + char*i + end)
+
+        return (beg + end)
     else:
         return reg
+
+def check_start_end(reg, ts):
+    # Check starting AND ending
+    if "^" in reg and "$" in reg:
+        ind = 0
+        orig_reg = reg
+        reg = reg[1:-1]
+        # Make sure reg is as long as ts
+        if len(reg) >= len(ts):
+            return reg, ts
+        if len(reg) < (len(ts)+1):
+            if "+" in reg:
+                ind = reg.index("+")
+                var_char = reg[ind - 1]
+                num = len(ts) - len(reg) + 1
+                reg = reg[0:ind] + (var_char * num) + reg[ind:]
+                return reg, ts
+            elif "*" in reg:
+                ind = reg.index("*")
+                var_char = reg[ind-1]
+                num = len(ts) - len(reg) + 1
+                reg = reg[0:ind] + (var_char*num) + reg[ind:]
+                return reg, ts
+            else:
+                reg = orig_reg
+                return reg, ts
+        #elif len(reg) >= len(ts):
+         #   return reg, ts
+        else:
+            reg = orig_reg
+            return reg, ts
+
+    # Check starting OR ending
+    if "^" in reg:
+        reg, ts = starting(reg, ts)
+    if '$' in reg:
+        reg, ts = ending(reg, ts)
+
+    return reg, ts
 
 
 def evaluate(reg, ts):
@@ -104,18 +148,11 @@ def evaluate(reg, ts):
     if ev:
         return True
 
-    # Check starting and ending
-    if reg[0] == "^":
-        reg, ts = starting(reg, ts)
-    if reg[-1] == '$':
-        reg, ts = ending(reg, ts)
-
     # Run the regression
     if reg and ts:
         if (reg[0] == ".") or (reg[0] == ts[0]):
             reg_ev = reg[1:]
             mod_string = ts[1:]
-            print(f'regression test - reg is {reg_ev} and string is {mod_string}')
             return evaluate(reg_ev, mod_string)
         elif reg[0] != ts[0]:
             return False
@@ -124,11 +161,13 @@ def evaluate(reg, ts):
 
 # Main Body
 regex, the_string = input_strings()
-#print(f'the regex after the input string function is {regex}')
+#print(f'the regex after the input string function is {regex} and the string is {the_string}')
+regex, the_string = check_start_end(regex, the_string)
+#print(f'the regex after checking for starting / ending chars is {regex} and the string is {the_string}')
 regex = check_questionmark(regex, the_string)
-#print(f'the regex after we check question mark is {regex}')
+#print(f'the regex after we check question mark is {regex} and the string is {the_string}')
 regex = check_star(regex, the_string)
-#print(f'the regex after we check star is {regex}')
+#print(f'the regex after we check star is {regex} and the string is {the_string}')
 regex = check_plus(regex, the_string)
-#print(f'the regex after we check plus is {regex}')
+#print(f'the regex after we check plus is {regex} and the string is {the_string}')
 print(evaluate(regex, the_string))
